@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>⚠️ XAVFSIZLIK BUZILDI!</title>
+    <style>
+        body {
+            background-color: black;
+            color: red;
+            text-align: center;
+            font-family: monospace;
+            padding-top: 100px;
+            transition: all 0.5s;
+        }
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+        button {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background-color: #111;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid red;
+        }
+        .info {
+            text-align: left;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .info span {
+            color: #ff6666;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="blink">⚠️ XAVFSIZLIK BUZILDI! ⚠️</h1>
+        <h2>Sizning ma'lumotlaringiz o'g'irlandi!</h2>
+        
+        <div class="info">
+            <p>🌐 IP Manzil: <span id="ip">Aniqlanmoqda...</span></p>
+            <p>📱 Qurilma: <span id="device">Aniqlanmoqda...</span></p>
+            <p>📱 Qurilma modeli: <span id="model">Aniqlanmoqda...</span></p>
+            <p>💻 Operatsion tizim: <span id="os">Aniqlanmoqda...</span></p>
+            <p>🌍 Brauzer: <span id="browser">Aniqlanmoqda...</span></p>
+            <p>📍 Lokatsiya: <span id="location">Aniqlanmoqda...</span></p>
+            <p>⏰ Vaqt: <span id="time"></span></p>
+        </div>
+        
+        <p style="margin-top: 20px;">⚠️ Hisobingiz 5 daqiqada bloklanadi!</p>
+        <button onclick="location.reload()">Qayta yuklash</button>
+    </div>
+    
+    <script>
+        // 1. IP MANZIL
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('ip').innerText = data.ip;
+            })
+            .catch(() => {
+                document.getElementById('ip').innerText = '84.54.90.123';
+            });
+        
+        // 2. LOKATSIYA (IP orqali taxminiy)
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                let location = `${data.city}, ${data.country_name}`;
+                document.getElementById('location').innerText = location;
+            })
+            .catch(() => {
+                document.getElementById('location').innerText = 'Toshkent, Oʻzbekiston';
+            });
+        
+        // 3. QURILMA MODELINI ANIQLASH (batafsil)
+        function getDeviceModel() {
+            let ua = navigator.userAgent;
+            let platform = navigator.platform;
+            
+            // SAMSUNG
+            if (ua.includes('SM-')) {
+                let match = ua.match(/SM-[A-Z0-9]+/);
+                if (match) return `Samsung ${match[0]}`;
+                return 'Samsung Galaxy';
+            }
+            
+            // iPhone
+            if (ua.includes('iPhone')) {
+                let match = ua.match(/iPhone(\d+,\d+)/);
+                if (match) {
+                    let models = {
+                        '14,2': 'iPhone 13 Pro',
+                        '14,3': 'iPhone 13 Pro Max',
+                        '14,4': 'iPhone 13 mini',
+                        '14,5': 'iPhone 13',
+                        '15,2': 'iPhone 14 Pro',
+                        '15,3': 'iPhone 14 Pro Max',
+                        '15,4': 'iPhone 14',
+                        '15,5': 'iPhone 14 Plus',
+                        '16,1': 'iPhone 15 Pro',
+                        '16,2': 'iPhone 15 Pro Max',
+                        '16,3': 'iPhone 15',
+                        '16,4': 'iPhone 15 Plus'
+                    };
+                    return models[match[1]] || `iPhone ${match[1]}`;
+                }
+                return 'iPhone';
+            }
+            
+            // iPad
+            if (ua.includes('iPad')) {
+                return 'iPad';
+            }
+            
+            // Google Pixel
+            if (ua.includes('Pixel')) {
+                let match = ua.match(/Pixel\s\d+/i);
+                return match ? match[0] : 'Google Pixel';
+            }
+            
+            // Xiaomi
+            if (ua.includes('Redmi') || ua.includes('Mi ')) {
+                if (ua.includes('Redmi')) {
+                    let match = ua.match(/Redmi\s[A-Z0-9]+/i);
+                    return match ? match[0] : 'Xiaomi Redmi';
+                }
+                return 'Xiaomi';
+            }
+            
+            // OnePlus
+            if (ua.includes('OnePlus')) {
+                return 'OnePlus';
+            }
+            
+            // Huawei
+            if (ua.includes('Huawei') || ua.includes('Honor')) {
+                return 'Huawei';
+            }
+            
+            // Windows kompyuter
+            if (platform === 'Win32' || platform === 'Win64') {
+                return 'Windows kompyuter';
+            }
+            
+            // Mac
+            if (platform === 'MacIntel') {
+                return 'MacBook / iMac';
+            }
+            
+            return 'Nomaʼlum qurilma';
+        }
+        
+        // 4. OPERATSION TIZIM
+        function getOS() {
+            let ua = navigator.userAgent;
+            
+            if (/Windows NT 10.0/i.test(ua)) return 'Windows 11 / 10';
+            if (/Windows NT 6.1/i.test(ua)) return 'Windows 7';
+            if (/Android/i.test(ua)) {
+                let match = ua.match(/Android\s([\d.]+)/);
+                return match ? `Android ${match[1]}` : 'Android';
+            }
+            if (/iPhone|iPad|iPod/i.test(ua)) {
+                let match = ua.match(/OS\s([\d_]+)/);
+                return match ? `iOS ${match[1].replace(/_/g, '.')}` : 'iOS';
+            }
+            if (/Mac OS X/i.test(ua)) return 'macOS';
+            if (/Linux/i.test(ua)) return 'Linux';
+            return 'Nomaʼlum';
+        }
+        
+        // 5. BRAUZER
+        function getBrowser() {
+            let ua = navigator.userAgent;
+            if (ua.includes('Edg/')) return 'Microsoft Edge';
+            if (ua.includes('Chrome/')) return 'Google Chrome';
+            if (ua.includes('Firefox/')) return 'Mozilla Firefox';
+            if (ua.includes('Safari/') && !ua.includes('Chrome')) return 'Apple Safari';
+            if (ua.includes('Opera/') || ua.includes('OPR/')) return 'Opera';
+            return 'Nomaʼlum';
+        }
+        
+        // 6. VAQT
+        function getTime() {
+            let now = new Date();
+            return now.toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' });
+        }
+        
+        // Barcha ma'lumotlarni o'rnatish
+        setTimeout(() => {
+            document.getElementById('device').innerText = getDeviceModel();
+            document.getElementById('model').innerText = getDeviceModel();
+            document.getElementById('os').innerText = getOS();
+            document.getElementById('browser').innerText = getBrowser();
+            document.getElementById('time').innerText = getTime();
+        }, 100);
+        
+        // 5 soniyadan keyin hazil
+        setTimeout(() => {
+            document.body.style.backgroundColor = "white";
+            document.body.style.color = "black";
+            document.querySelector('.container').style.backgroundColor = "#f0f0f0";
+            document.querySelector('.container').style.border = "1px solid green";
+            document.querySelector('h1').innerHTML = "😂 HAZIL EDI! 😂";
+            document.querySelector('h2').innerHTML = "Hech narsa o'g'irlanmadi!";
+            document.querySelector('h1').style.color = "green";
+            document.querySelector('h2').style.color = "green";
+            document.querySelectorAll('.info span').forEach(span => {
+                span.style.color = "green";
+            });
+            alert("😂 Hazil edi! Hech narsa bo'lmadi!");
+        }, 5000);
+    </script>
+</body>
+</html>
